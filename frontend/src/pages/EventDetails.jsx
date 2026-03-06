@@ -7,7 +7,7 @@ export default function EventDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const backend = "http://localhost:4000";
+  const backend = process.env.REACT_APP_API_URL || "http://localhost:4000";
 
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -19,22 +19,34 @@ export default function EventDetails() {
 
   const [toast, setToast] = useState({ message: "", type: "info" });
 
-  async function load() {
-    setLoading(true);
-    try {
-      const res = await api.get(`/events/${id}`);
-      setEvent(res.data);
-      setSelectedDate(res.data.availableDates?.[0] || "");
-      setAttendees(res.data.minAttendees || 1);
-    } catch {
-      setEvent(null);
-    } finally {
-      setLoading(false);
-    }
-  }
-
   useEffect(() => {
-    load();
+    let ignore = false;
+
+    async function loadEvent() {
+      setLoading(true);
+      try {
+        const res = await api.get(`/events/${id}`);
+        if (!ignore) {
+          setEvent(res.data);
+          setSelectedDate(res.data.availableDates?.[0] || "");
+          setAttendees(res.data.minAttendees || 1);
+        }
+      } catch {
+        if (!ignore) {
+          setEvent(null);
+        }
+      } finally {
+        if (!ignore) {
+          setLoading(false);
+        }
+      }
+    }
+
+    loadEvent();
+
+    return () => {
+      ignore = true;
+    };
   }, [id]);
 
   const foodPrice = useMemo(() => {

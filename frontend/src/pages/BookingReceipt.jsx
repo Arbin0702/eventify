@@ -9,28 +9,41 @@ export default function BookingReceipt() {
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState({ message: "", type: "info" });
 
-  async function load() {
-    setLoading(true);
-    try {
-      const res = await api.get(`/bookings/${id}`);
-      setBooking(res.data);
-    } catch (e) {
-      setToast({
-        type: "error",
-        message: e?.response?.data?.message || "Failed to load receipt"
-      });
-      setBooking(null);
-    } finally {
-      setLoading(false);
-    }
-  }
-
   useEffect(() => {
-    load();
+    let ignore = false;
+
+    async function loadBooking() {
+      setLoading(true);
+      try {
+        const res = await api.get(`/bookings/${id}`);
+        if (!ignore) {
+          setBooking(res.data);
+        }
+      } catch (e) {
+        if (!ignore) {
+          setToast({
+            type: "error",
+            message: e?.response?.data?.message || "Failed to load receipt"
+          });
+          setBooking(null);
+        }
+      } finally {
+        if (!ignore) {
+          setLoading(false);
+        }
+      }
+    }
+
+    loadBooking();
+
+    return () => {
+      ignore = true;
+    };
   }, [id]);
 
   const breakdown = useMemo(() => {
     if (!booking?.eventId) return { venue: 0, food: 0, photo: 0 };
+
     const event = booking.eventId;
     const venue = event.venuePrice || 0;
     const perPerson = event.foodPricing?.[booking.foodPackage] || 0;
@@ -39,6 +52,7 @@ export default function BookingReceipt() {
       booking.photographySelected && event.photographyService?.available
         ? event.photographyService.price || 0
         : 0;
+
     return { venue, food, photo };
   }, [booking]);
 

@@ -69,11 +69,17 @@ export default function Navbar() {
           </button>
 
           <div className={`megaNavLinks ${mobileOpen ? "mobileOpen" : ""}`}>
-            <Link className="link" to="/" onClick={closeAll}>Home</Link>
+            <Link className="link" to="/" onClick={closeAll}>
+              Home
+            </Link>
 
             {/* SERVICES */}
             <div className="megaMenuWrap">
-              <button className="megaMenuBtn" onClick={() => toggle("services")} type="button">
+              <button
+                className={`megaMenuBtn ${openMenu === "services" ? "active" : ""}`}
+                onClick={() => toggle("services")}
+                type="button"
+              >
                 Services ▾
               </button>
 
@@ -138,50 +144,81 @@ export default function Navbar() {
             </div>
 
             {/* EVENTS */}
-            <div className="megaMenuWrap">
-              <button className="megaMenuBtn" onClick={() => toggle("events")} type="button">
+            <div className="megaMenuWrap rightAlign">
+              <button
+                className={`megaMenuBtn ${openMenu === "events" ? "active" : ""}`}
+                onClick={() => toggle("events")}
+                type="button"
+              >
                 Events ▾
               </button>
 
               <div className={`megaMenuPanel smallPanel ${openMenu === "events" ? "showPanel" : ""}`}>
                 <div className="megaSimpleMenu">
-                  <Link to="/events" onClick={closeAll}>Browse Events</Link>
+                  <Link to="/events" onClick={closeAll}>
+                    Browse Events
+                  </Link>
                   {user?.role === "admin" && (
-                    <Link to="/create-event" onClick={closeAll}>Create Event</Link>
+                    <Link to="/create-event" onClick={closeAll}>
+                      Create Event
+                    </Link>
                   )}
                 </div>
               </div>
             </div>
 
-            <Link className="link" to="/work" onClick={closeAll}>Work</Link>
-            <Link className="link" to="/contact" onClick={closeAll}>Contact</Link>
+            <Link className="link" to="/work" onClick={closeAll}>
+              Work
+            </Link>
+
+            <Link className="link" to="/contact" onClick={closeAll}>
+              Contact
+            </Link>
 
             {token && (
-              <div className="megaMenuWrap">
-                <button className="megaMenuBtn" onClick={() => toggle("dashboard")} type="button">
+              <div className="megaMenuWrap rightAlign">
+                <button
+                  className={`megaMenuBtn ${openMenu === "dashboard" ? "active" : ""}`}
+                  onClick={() => toggle("dashboard")}
+                  type="button"
+                >
                   Dashboard ▾
                 </button>
 
                 <div className={`megaMenuPanel smallPanel ${openMenu === "dashboard" ? "showPanel" : ""}`}>
                   <div className="megaSimpleMenu">
-                    <Link to="/dashboard" onClick={closeAll}>My Bookings</Link>
-                    <Link to="/profile" onClick={closeAll}>Profile</Link>
+                    <Link to="/dashboard" onClick={closeAll}>
+                      My Bookings
+                    </Link>
+                    <Link to="/profile" onClick={closeAll}>
+                      Profile
+                    </Link>
                   </div>
                 </div>
               </div>
             )}
 
             {user?.role === "admin" && (
-              <div className="megaMenuWrap">
-                <button className="megaMenuBtn" onClick={() => toggle("admin")} type="button">
+              <div className="megaMenuWrap rightAlign">
+                <button
+                  className={`megaMenuBtn ${openMenu === "admin" ? "active" : ""}`}
+                  onClick={() => toggle("admin")}
+                  type="button"
+                >
                   Admin ▾
                 </button>
 
                 <div className={`megaMenuPanel smallPanel ${openMenu === "admin" ? "showPanel" : ""}`}>
                   <div className="megaSimpleMenu">
-                    <Link to="/admin/inbox" onClick={closeAll}>Inbox</Link>
-                    <Link to="/admin/portfolio" onClick={closeAll}>Portfolio</Link>
-                    <Link to="/admin/bookings" onClick={closeAll}>Bookings</Link>
+                    <Link to="/admin/inbox" onClick={closeAll}>
+                      Inbox
+                    </Link>
+                    <Link to="/admin/portfolio" onClick={closeAll}>
+                      Portfolio
+                    </Link>
+                    <Link to="/admin/bookings" onClick={closeAll}>
+                      Bookings
+                    </Link>
                   </div>
                 </div>
               </div>
@@ -192,8 +229,12 @@ export default function Navbar() {
 
               {!token ? (
                 <div className="row">
-                  <Link className="btn ghost" to="/login" onClick={closeAll}>Login</Link>
-                  <Link className="btn primary" to="/register" onClick={closeAll}>Register</Link>
+                  <Link className="btn ghost" to="/login" onClick={closeAll}>
+                    Login
+                  </Link>
+                  <Link className="btn primary" to="/register" onClick={closeAll}>
+                    Register
+                  </Link>
                 </div>
               ) : (
                 <button className="btn ghost" onClick={logout}>
@@ -208,8 +249,12 @@ export default function Navbar() {
 
             {!token ? (
               <>
-                <Link className="btn ghost" to="/login">Login</Link>
-                <Link className="btn primary" to="/register">Register</Link>
+                <Link className="btn ghost" to="/login">
+                  Login
+                </Link>
+                <Link className="btn primary" to="/register">
+                  Register
+                </Link>
               </>
             ) : (
               <button className="btn ghost" onClick={logout}>
