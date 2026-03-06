@@ -1,7 +1,7 @@
 const request = require("supertest");
 const app = require("../src/app");
 const User = require("../src/models/User");
-const bcrypt = require("bcrypt.js");
+const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 function signToken(payload) {
