@@ -14,7 +14,6 @@ const errorHandler = require("./middleware/errorHandler");
 
 const app = express();
 
-// IMPORTANT: allow images/files from backend to be shown in frontend
 app.use(
   helmet({
     crossOriginResourcePolicy: { policy: "cross-origin" }
@@ -32,14 +31,12 @@ app.use(
 
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: process.env.CLIENT_URL || "http://localhost:3000",
     credentials: true
   })
 );
 
 app.use(express.json());
-
-// Serve uploaded files
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 app.get("/health", (req, res) => res.json({ ok: true }));

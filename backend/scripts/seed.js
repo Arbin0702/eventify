@@ -1,6 +1,6 @@
 require("dotenv").config();
 const mongoose = require("mongoose");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcrypt.js");
 
 const User = require("../src/models/User");
 const Event = require("../src/models/Event");
