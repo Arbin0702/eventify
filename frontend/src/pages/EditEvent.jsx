@@ -9,7 +9,7 @@ export default function EditEvent() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const backend = process.env.REACT_APP_API_URL || "http://localhost:4000";
+  const backend = "https://eventify-vrrg.onrender.com";
 
   const [title, setTitle] = useState("");
   const [location, setLocation] = useState("");
@@ -75,7 +75,9 @@ export default function EditEvent() {
     if (!title.trim()) e.title = "Title is required";
     if (!location.trim()) e.location = "Location is required";
     if (!description.trim()) e.description = "Description is required";
-    if (!keepExistingImage && !newImage) e.image = "Choose a new image or keep the current one";
+    if (!keepExistingImage && !newImage) {
+      e.image = "Choose a new image or keep the current one";
+    }
 
     const cleanedDates = availableDates.map((d) => d.trim()).filter(Boolean);
     if (cleanedDates.length === 0) e.availableDates = "At least one date is required";
@@ -140,12 +142,11 @@ export default function EditEvent() {
     );
   }
 
-  const previewSrc =
-    currentImageUrl
-      ? currentImageUrl.startsWith("http")
-        ? currentImageUrl
-        : `${backend}${currentImageUrl}`
-      : "";
+  const previewSrc = currentImageUrl
+    ? currentImageUrl.startsWith("http")
+      ? currentImageUrl
+      : `${backend}${currentImageUrl}`
+    : "";
 
   return (
     <div className="container" style={{ paddingTop: 18 }}>
@@ -162,9 +163,13 @@ export default function EditEvent() {
             <p>Update all pricing, dates, services and attendee options.</p>
           </div>
 
-          <Link className="btn ghost" to={`/events/${id}`} style={{ textDecoration: "none" }}>
-            ← Back
-          </Link>
+          <Link
+  className="btn ghost"
+  to={`/admin/events/${event._id}/edit`}
+  style={{ textDecoration: "none" }}
+>
+  Edit
+</Link>
         </div>
       </section>
 
@@ -198,6 +203,11 @@ export default function EditEvent() {
                 src={previewSrc}
                 alt="Current event"
                 style={{ width: "100%", height: 220, objectFit: "cover", borderRadius: 16 }}
+                onError={(e) => {
+                  e.currentTarget.onerror = null;
+                  e.currentTarget.src =
+                    "https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1400&q=80";
+                }}
               />
             </div>
           )}
