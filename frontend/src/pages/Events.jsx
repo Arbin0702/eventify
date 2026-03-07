@@ -9,7 +9,7 @@ export default function Events() {
   const [locationFilter, setLocationFilter] = useState("ALL");
   const [loading, setLoading] = useState(true);
 
-const backend = "https://eventify-vrrg.onrender.com";
+  const backend = "https://eventify-vrrg.onrender.com";
 
   async function load() {
     setLoading(true);
