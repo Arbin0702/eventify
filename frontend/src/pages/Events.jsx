@@ -9,11 +9,10 @@ export default function Events() {
   const [locationFilter, setLocationFilter] = useState("ALL");
   const [loading, setLoading] = useState(true);
 
-  // Automatically detect backend URL
   const backend =
-    process.env.NODE_ENV === "development"
-      ? "http://localhost:4000"
-      : "https://eventify-vrrg.onrender.com";
+    import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
+
+  const user = JSON.parse(localStorage.getItem("user") || "null");
 
   async function load() {
     setLoading(true);
@@ -58,13 +57,24 @@ export default function Events() {
       return "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1400&q=80";
     }
 
-    // If full URL already
-    if (imageUrl.startsWith("http")) {
+    if (imageUrl.startsWith("http://") || imageUrl.startsWith("https://")) {
       return imageUrl;
     }
 
-    // If relative path from backend
     return `${backend}${imageUrl}`;
+  }
+
+  async function handleDelete(eventId) {
+    const ok = window.confirm("Delete this event?");
+    if (!ok) return;
+
+    try {
+      await api.delete(`/events/${eventId}`);
+      await load();
+    } catch (err) {
+      console.error("Failed to delete event:", err);
+      alert("Failed to delete event");
+    }
   }
 
   return (
@@ -125,8 +135,9 @@ export default function Events() {
                   src={getImageSrc(event.imageUrl)}
                   alt={event.title}
                   onError={(e) => {
+                    e.currentTarget.onerror = null;
                     e.currentTarget.src =
-                      "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1400&q=80";
+                      "https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1400&q=80";
                   }}
                 />
               </div>
@@ -138,7 +149,13 @@ export default function Events() {
                     <div className="muted" style={{ marginTop: 6 }}>
                       {event.location}
                     </div>
+                    <div className="muted" style={{ marginTop: 6 }}>
+                      {event.availableDates?.length
+                        ? `Available: ${event.availableDates.join(", ")}`
+                        : "Date to be confirmed"}
+                    </div>
                   </div>
+
                   <span className="badge">Venue ${event.venuePrice}</span>
                 </div>
 
@@ -164,7 +181,7 @@ export default function Events() {
                   style={{ marginTop: 14, justifyContent: "space-between" }}
                 >
                   <span className="badge">
-                    Food from ${event.foodPricing?.standard}/person
+                    Food from ${event.foodPricing?.standard || 0}/person
                   </span>
 
                   <Link
@@ -175,6 +192,25 @@ export default function Events() {
                     Select Event
                   </Link>
                 </div>
+
+                {user?.role === "admin" && (
+                  <div className="row" style={{ marginTop: 10, gap: 10 }}>
+                    <Link
+                      className="btn ghost"
+                      to={`/admin/events/edit/${event._id}`}
+                      style={{ textDecoration: "none" }}
+                    >
+                      Edit
+                    </Link>
+
+                    <button
+                      className="btn ghost"
+                      onClick={() => handleDelete(event._id)}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </Reveal>
