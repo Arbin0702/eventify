@@ -9,14 +9,19 @@ export default function Events() {
   const [locationFilter, setLocationFilter] = useState("ALL");
   const [loading, setLoading] = useState(true);
 
-  const backend = "https://eventify-vrrg.onrender.com";
+  // Automatically detect backend URL
+  const backend =
+    process.env.NODE_ENV === "development"
+      ? "http://localhost:4000"
+      : "https://eventify-vrrg.onrender.com";
 
   async function load() {
     setLoading(true);
     try {
       const res = await api.get("/events");
       setEvents(res.data);
-    } catch {
+    } catch (err) {
+      console.error("Failed to load events:", err);
       setEvents([]);
     } finally {
       setLoading(false);
@@ -38,10 +43,11 @@ export default function Events() {
     return events.filter((e) => {
       const matchText =
         !query ||
-        e.title.toLowerCase().includes(query) ||
-        e.location.toLowerCase().includes(query);
+        e.title?.toLowerCase().includes(query) ||
+        e.location?.toLowerCase().includes(query);
 
-      const matchLocation = locationFilter === "ALL" || e.location === locationFilter;
+      const matchLocation =
+        locationFilter === "ALL" || e.location === locationFilter;
 
       return matchText && matchLocation;
     });
@@ -52,10 +58,12 @@ export default function Events() {
       return "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1400&q=80";
     }
 
-    if (imageUrl.startsWith("http://") || imageUrl.startsWith("https://")) {
+    // If full URL already
+    if (imageUrl.startsWith("http")) {
       return imageUrl;
     }
 
+    // If relative path from backend
     return `${backend}${imageUrl}`;
   }
 
@@ -66,7 +74,8 @@ export default function Events() {
           <div className="sectionHeading">
             <h2>Choose your event package</h2>
             <p>
-              Pick an event, choose your date, number of attendees, food option, and photography add-on.
+              Pick an event, choose your date, number of attendees, food option,
+              and photography add-on.
             </p>
           </div>
 
@@ -95,10 +104,16 @@ export default function Events() {
         </section>
       </Reveal>
 
-      {loading && <div className="friendlyCard" style={{ marginTop: 16 }}>Loading events...</div>}
+      {loading && (
+        <div className="friendlyCard" style={{ marginTop: 16 }}>
+          Loading events...
+        </div>
+      )}
 
       {!loading && filtered.length === 0 && (
-        <div className="friendlyCard" style={{ marginTop: 16 }}>No events found.</div>
+        <div className="friendlyCard" style={{ marginTop: 16 }}>
+          No events found.
+        </div>
       )}
 
       <div className="friendlyGrid3" style={{ marginTop: 18 }}>
@@ -120,7 +135,9 @@ export default function Events() {
                 <div className="row" style={{ justifyContent: "space-between" }}>
                   <div>
                     <h3 style={{ margin: 0 }}>{event.title}</h3>
-                    <div className="muted" style={{ marginTop: 6 }}>{event.location}</div>
+                    <div className="muted" style={{ marginTop: 6 }}>
+                      {event.location}
+                    </div>
                   </div>
                   <span className="badge">Venue ${event.venuePrice}</span>
                 </div>
@@ -129,21 +146,32 @@ export default function Events() {
 
                 <div className="row" style={{ marginTop: 12 }}>
                   <span className="badge">
-                    🚗 {event.parkingAvailable ? "Parking Available" : "No Parking"}
+                    🚗 {event.parkingAvailable
+                      ? "Parking Available"
+                      : "No Parking"}
                   </span>
+
                   <span className="badge">
-                    📸 {event.photographyService?.available
+                    📸{" "}
+                    {event.photographyService?.available
                       ? `Photo $${event.photographyService.price}`
                       : "No Photo Service"}
                   </span>
                 </div>
 
-                <div className="row" style={{ marginTop: 14, justifyContent: "space-between" }}>
+                <div
+                  className="row"
+                  style={{ marginTop: 14, justifyContent: "space-between" }}
+                >
                   <span className="badge">
                     Food from ${event.foodPricing?.standard}/person
                   </span>
 
-                  <Link className="btn primary" to={`/events/${event._id}`} style={{ textDecoration: "none" }}>
+                  <Link
+                    className="btn primary"
+                    to={`/events/${event._id}`}
+                    style={{ textDecoration: "none" }}
+                  >
                     Select Event
                   </Link>
                 </div>
