@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 require("dotenv").config();
 console.log("MONGO_URI =", process.env.MONGO_URI);
-const Event = require("./src/models/Event");
+const Event = require("../models/Event");
 
 const USER_ID = "000000000000000000000001";
 
