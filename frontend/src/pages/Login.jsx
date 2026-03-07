@@ -29,9 +29,12 @@ export default function Login() {
     setLoading(true);
     try {
       const res = await api.post("/auth/login", { email, password });
+
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("user", JSON.stringify(res.data.user));
+
       navigate("/events");
+      window.location.reload();
     } catch (e) {
       setError(e?.response?.data?.message || "Login failed");
     } finally {
