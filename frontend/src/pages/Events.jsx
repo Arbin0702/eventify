@@ -9,9 +9,7 @@ export default function Events() {
   const [locationFilter, setLocationFilter] = useState("ALL");
   const [loading, setLoading] = useState(true);
 
-  const backend =
-    import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
-
+  const backend = "https://eventify-vrrg.onrender.com";
   const user = JSON.parse(localStorage.getItem("user") || "null");
 
   async function load() {
@@ -163,9 +161,7 @@ export default function Events() {
 
                 <div className="row" style={{ marginTop: 12 }}>
                   <span className="badge">
-                    🚗 {event.parkingAvailable
-                      ? "Parking Available"
-                      : "No Parking"}
+                    🚗 {event.parkingAvailable ? "Parking Available" : "No Parking"}
                   </span>
 
                   <span className="badge">
@@ -195,14 +191,6 @@ export default function Events() {
 
                 {user?.role === "admin" && (
                   <div className="row" style={{ marginTop: 10, gap: 10 }}>
-                    <Link
-                      className="btn ghost"
-                      to={`/admin/events/edit/${event._id}`}
-                      style={{ textDecoration: "none" }}
-                    >
-                      Edit
-                    </Link>
-
                     <button
                       className="btn ghost"
                       onClick={() => handleDelete(event._id)}
