@@ -1,126 +1,64 @@
-const mongoose = require("mongoose");
-require("dotenv").config();
-console.log("MONGO_URI =", process.env.MONGO_URI);
 const Event = require("../models/Event");
-
-const USER_ID = "000000000000000000000001";
-
-const events = [
-{
-title: "Music Festival",
-location: "Sydney",
-description: "Outdoor music event",
-imageUrl: "https://images.unsplash.com/photo-1506157786151-b8491531f063",
-availableDates: ["2026-06-10"],
-venuePrice: 1000,
-createdBy: USER_ID
-},
-{
-title: "Tech Conference",
-location: "Sydney CBD",
-description: "Technology networking event",
-imageUrl: "https://images.unsplash.com/photo-1551836022-d5d88e9218df",
-availableDates: ["2026-05-20"],
-venuePrice: 1500,
-createdBy: USER_ID
-},
-{
-title: "Wedding Expo",
-location: "Parramatta",
-description: "Wedding planning exhibition",
-imageUrl: "https://images.unsplash.com/photo-1519741497674-611481863552",
-availableDates: ["2026-07-15"],
-venuePrice: 2000,
-createdBy: USER_ID
-},
-{
-title: "Startup Pitch",
-location: "Haymarket",
-description: "Startup investors event",
-imageUrl: "https://images.unsplash.com/photo-1556761175-b413da4baf72",
-availableDates: ["2026-08-10"],
-venuePrice: 500,
-createdBy: USER_ID
-},
-{
-title: "Art Exhibition",
-location: "Opera House",
-description: "Modern art display",
-imageUrl: "https://images.unsplash.com/photo-1531058020387-3be344556be6",
-availableDates: ["2026-04-10"],
-venuePrice: 800,
-createdBy: USER_ID
-},
-{
-title: "Food Festival",
-location: "Darling Harbour",
-description: "Street food celebration",
-imageUrl: "https://images.unsplash.com/photo-1504674900247-0877df9cc836",
-availableDates: ["2026-09-05"],
-venuePrice: 1200,
-createdBy: USER_ID
-},
-{
-title: "Fashion Show",
-location: "Sydney CBD",
-description: "Designer fashion show",
-imageUrl: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d",
-availableDates: ["2026-10-10"],
-venuePrice: 2500,
-createdBy: USER_ID
-},
-{
-title: "Business Meetup",
-location: "Chatswood",
-description: "Business networking",
-imageUrl: "https://images.unsplash.com/photo-1521737604893-d14cc237f11d",
-availableDates: ["2026-03-25"],
-venuePrice: 400,
-createdBy: USER_ID
-},
-{
-title: "Cultural Festival",
-location: "Granville",
-description: "Community cultural celebration",
-imageUrl: "https://images.unsplash.com/photo-1508609349937-5ec4ae374ebf",
-availableDates: ["2026-11-02"],
-venuePrice: 700,
-createdBy: USER_ID
-},
-{
-title: "Gaming Convention",
-location: "Sydney Olympic Park",
-description: "Video game expo",
-imageUrl: "https://images.unsplash.com/photo-1542751371-adc38448a05e",
-availableDates: ["2026-12-01"],
-venuePrice: 1800,
-createdBy: USER_ID
-}
-];
+const User = require("../models/User");
 
 async function seedEvents() {
-try {
+  try {
+    const adminEmail = process.env.ADMIN_EMAIL;
 
-await mongoose.connect(process.env.MONGO_URI);
+    if (!adminEmail) {
+      console.log("Event seed skipped: ADMIN_EMAIL missing");
+      return;
+    }
 
-console.log("MongoDB connected");
+    const adminUser = await User.findOne({ email: adminEmail });
 
-await Event.deleteMany();
+    if (!adminUser) {
+      console.log("Event seed skipped: admin user not found");
+      return;
+    }
 
-console.log("Old events deleted");
+    const existingCount = await Event.countDocuments();
+    if (existingCount > 0) {
+      console.log("Events already exist, skipping seed");
+      return;
+    }
 
-await Event.insertMany(events);
+    const demoEvents = [
+      {
+        title: "Sydney Tech Conference",
+        location: "Sydney CBD",
+        description: "A premium technology conference with keynote speakers, startup showcases, and networking sessions.",
+        imageUrl: "https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1400&q=80",
+        availableDates: ["2026-04-12", "2026-04-13"],
+        minAttendees: 20,
+        maxAttendees: 300,
+        venuePrice: 2500,
+        foodPricing: { standard: 35, premium: 55, vip: 80 },
+        parkingAvailable: true,
+        photographyService: { available: true, price: 400 },
+        createdBy: adminUser._id
+      },
+      {
+        title: "Corporate Gala Dinner",
+        location: "Parramatta",
+        description: "An elegant gala dinner package designed for companies, award nights, and executive networking.",
+        imageUrl: "https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=1400&q=80",
+        availableDates: ["2026-05-18", "2026-05-19"],
+        minAttendees: 50,
+        maxAttendees: 250,
+        venuePrice: 3200,
+        foodPricing: { standard: 45, premium: 70, vip: 95 },
+        parkingAvailable: true,
+        photographyService: { available: true, price: 500 },
+        createdBy: adminUser._id
+      }
+    ];
 
-console.log("10 events inserted");
-
-process.exit();
-
-} catch (err) {
-
-console.error(err);
-process.exit(1);
-
+    await Event.insertMany(demoEvents);
+    console.log("Demo events seeded successfully");
+  } catch (error) {
+    console.error("Error seeding demo events:", error.message);
+  }
 }
-}
 
-seedEvents();
+module.exports = seedEvents;
