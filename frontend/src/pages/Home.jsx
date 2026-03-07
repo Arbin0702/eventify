@@ -36,6 +36,7 @@ function Testimonial({ name, role, text }) {
 
 export default function Home() {
   const token = localStorage.getItem("token");
+  const user = JSON.parse(localStorage.getItem("user") || "null");
 
   return (
     <div className="container" style={{ paddingTop: 18 }}>
@@ -43,25 +44,38 @@ export default function Home() {
         <section className="heroFriendly">
           <div className="heroFriendlyContent">
             <span className="badge">Event planning made simple</span>
-            <h1>Create unforgettable events with a website that feels real</h1>
+            <h1>Plan memorable events with confidence</h1>
             <p>
-              Eventify combines a modern event agency style with a working booking platform.
-              Showcase your services, display past work, and let users browse and book events easily.
+              Eventify is a modern event management platform where users can
+              explore event packages, compare services, and book with ease,
+              while admins manage events from one place.
             </p>
 
-            <div className="row" style={{ marginTop: 16 }}>
+            <div className="row" style={{ marginTop: 16, gap: 12, flexWrap: "wrap" }}>
               <Link className="btn primary" to="/events" style={{ textDecoration: "none" }}>
                 Explore Events
               </Link>
+
               <Link className="btn" to="/services" style={{ textDecoration: "none" }}>
                 Our Services
               </Link>
-              {!token && (
+
+              {!token ? (
                 <Link className="btn ghost" to="/register" style={{ textDecoration: "none" }}>
                   Get Started
                 </Link>
+              ) : (
+                <Link className="btn ghost" to="/dashboard" style={{ textDecoration: "none" }}>
+                  My Dashboard
+                </Link>
               )}
             </div>
+
+            {user?.name && (
+              <div className="muted" style={{ marginTop: 14 }}>
+                Welcome back, {user.name}
+              </div>
+            )}
 
             <div className="heroStatsRow">
               <Stat valueNode={<Counter to={24} suffix="/7" />} label="Access" />
@@ -79,27 +93,28 @@ export default function Home() {
       <Reveal>
         <section className="friendlySection">
           <div className="sectionHeading">
-            <h2>Why people will enjoy using your website</h2>
+            <h2>Why choose Eventify?</h2>
             <p>
-              The design now feels softer, more visual, and easier to trust — closer to real event agency websites.
+              Eventify combines professional presentation with a real working
+              booking experience, making the platform both attractive and useful.
             </p>
           </div>
 
           <div className="friendlyGrid3">
             <FeatureCard
               icon="🎉"
-              title="Friendly first impression"
-              text="Large visuals, softer cards, and cleaner spacing make the website feel welcoming."
+              title="Professional event experience"
+              text="Browse polished event packages with clear pricing, event details, and service options."
             />
             <FeatureCard
-              icon="🖼️"
-              title="More visual storytelling"
-              text="Images help visitors quickly understand your services and the kind of events you create."
+              icon="📅"
+              title="Simple booking flow"
+              text="Users can select dates, attendees, food packages, and optional services in one smooth process."
             />
             <FeatureCard
               icon="⚡"
-              title="Easy to navigate"
-              text="Clear buttons and simple page flow help people move from interest to enquiry fast."
+              title="Easy to manage"
+              text="Admins can create, update, and manage events while keeping the website modern and user-friendly."
             />
           </div>
         </section>
@@ -115,10 +130,12 @@ export default function Home() {
             <span className="badge">Agency-style presentation</span>
             <h2>Show services like a real event company</h2>
             <p>
-              Present activations, corporate events, community events, exhibitions and logistics
-              in a way that feels premium and professional.
+              Present brand activations, corporate events, community events,
+              exhibitions, and logistics support in a way that feels premium
+              and trustworthy.
             </p>
-            <div className="row" style={{ marginTop: 14 }}>
+
+            <div className="row" style={{ marginTop: 14, gap: 12, flexWrap: "wrap" }}>
               <Link className="btn primary" to="/services" style={{ textDecoration: "none" }}>
                 View Services
               </Link>
@@ -134,7 +151,9 @@ export default function Home() {
         <section className="friendlySection">
           <div className="sectionHeading">
             <h2>What clients might say</h2>
-            <p>These short testimonials make the site feel more trustworthy and human.</p>
+            <p>
+              Testimonials help the website feel more human, trustworthy, and business-ready.
+            </p>
           </div>
 
           <div className="friendlyGrid3">
@@ -162,11 +181,11 @@ export default function Home() {
           <div>
             <h2>Ready to plan something amazing?</h2>
             <p>
-              Browse live events, review services, or send an enquiry and start the conversation.
+              Browse live events, review services, or send an enquiry to start planning your next event.
             </p>
           </div>
 
-          <div className="row">
+          <div className="row" style={{ gap: 12, flexWrap: "wrap" }}>
             <Link className="btn primary" to="/contact" style={{ textDecoration: "none" }}>
               Request Quote
             </Link>
