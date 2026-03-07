@@ -9,7 +9,7 @@ export default function Events() {
   const [locationFilter, setLocationFilter] = useState("ALL");
   const [loading, setLoading] = useState(true);
 
-  const backend = "http://localhost:4000";
+const backend = "https://eventify-vrrg.onrender.com";
 
   async function load() {
     setLoading(true);
