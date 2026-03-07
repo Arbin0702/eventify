@@ -16,7 +16,7 @@ export default function Events() {
     setLoading(true);
     try {
       const res = await api.get("/events");
-      setEvents(res.data);
+      setEvents(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       console.error("Failed to load events:", err);
       setEvents([]);
