@@ -71,7 +71,7 @@ export default function Login() {
           <button className="btn primary" onClick={handleLogin} disabled={loading}>
             {loading ? "Logging in..." : "Login"}
           </button>
-          <span className="muted">Tip: admin@test.com / admin123</span>
+          <span className="muted">Tip: admin@test.com / Admin12345</span>
         </div>
       </div>
     </div>
