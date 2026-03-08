@@ -15,13 +15,13 @@ export default function CreateEvent() {
   const [maxAttendees, setMaxAttendees] = useState(100);
   const [venuePrice, setVenuePrice] = useState(0);
 
-  const [foodStandard, setFoodStandard] = useState(0);
-  const [foodPremium, setFoodPremium] = useState(0);
-  const [foodVip, setFoodVip] = useState(0);
+  const [foodStandard, setFoodStandard] = useState(10);
+  const [foodPremium, setFoodPremium] = useState(15);
+  const [foodVip, setFoodVip] = useState(20);
 
   const [parkingAvailable, setParkingAvailable] = useState(false);
-  const [photoAvailable, setPhotoAvailable] = useState(false);
-  const [photoPrice, setPhotoPrice] = useState(0);
+  const [photoAvailable, setPhotoAvailable] = useState(true);
+  const [photoPrice, setPhotoPrice] = useState(25);
 
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState({ message: "", type: "info" });
@@ -84,12 +84,12 @@ export default function CreateEvent() {
       setMinAttendees(1);
       setMaxAttendees(100);
       setVenuePrice(0);
-      setFoodStandard(0);
-      setFoodPremium(0);
-      setFoodVip(0);
+      setFoodStandard(10);
+      setFoodPremium(15);
+      setFoodVip(20);
       setParkingAvailable(false);
-      setPhotoAvailable(false);
-      setPhotoPrice(0);
+      setPhotoAvailable(true);
+      setPhotoPrice(25);
       setFieldErrors({});
     } catch (e) {
       setToast({
@@ -272,7 +272,12 @@ export default function CreateEvent() {
               <input
                 type="checkbox"
                 checked={photoAvailable}
-                onChange={(e) => setPhotoAvailable(e.target.checked)}
+                onChange={(e) => {
+                  setPhotoAvailable(e.target.checked);
+                  if (e.target.checked && Number(photoPrice) <= 0) {
+                    setPhotoPrice(25);
+                  }
+                }}
               />
               <span>Photography available</span>
             </label>

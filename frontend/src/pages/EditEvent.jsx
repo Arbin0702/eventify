@@ -53,13 +53,21 @@ export default function EditEvent() {
         setMaxAttendees(item.maxAttendees || 100);
         setVenuePrice(item.venuePrice || 0);
 
-        setFoodStandard(item.foodPricing?.standard || 0);
-        setFoodPremium(item.foodPricing?.premium || 0);
-        setFoodVip(item.foodPricing?.vip || 0);
+        setFoodStandard(item.foodPricing?.standard > 0 ? item.foodPricing.standard : 10);
+        setFoodPremium(item.foodPricing?.premium > 0 ? item.foodPricing.premium : 15);
+        setFoodVip(item.foodPricing?.vip > 0 ? item.foodPricing.vip : 20);
 
         setParkingAvailable(Boolean(item.parkingAvailable));
-        setPhotoAvailable(Boolean(item.photographyService?.available));
-        setPhotoPrice(item.photographyService?.price || 0);
+        setPhotoAvailable(
+          item.photographyService?.available !== undefined
+            ? Boolean(item.photographyService.available)
+            : true
+        );
+        setPhotoPrice(
+          item.photographyService?.price > 0
+            ? item.photographyService.price
+            : 25
+        );
       } catch {
         setToast({ type: "error", message: "❌ Failed to load event" });
       } finally {
@@ -345,7 +353,12 @@ export default function EditEvent() {
               <input
                 type="checkbox"
                 checked={photoAvailable}
-                onChange={(e) => setPhotoAvailable(e.target.checked)}
+                onChange={(e) => {
+                  setPhotoAvailable(e.target.checked);
+                  if (e.target.checked && Number(photoPrice) <= 0) {
+                    setPhotoPrice(25);
+                  }
+                }}
               />
               <span>Photography available</span>
             </label>
