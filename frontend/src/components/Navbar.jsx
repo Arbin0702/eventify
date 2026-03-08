@@ -82,6 +82,18 @@ export default function Navbar() {
               Contact
             </Link>
 
+            {token && (
+              <>
+                <Link className="link" to="/dashboard" onClick={closeAll}>
+                  My Bookings
+                </Link>
+
+                <Link className="link" to="/profile" onClick={closeAll}>
+                  Profile
+                </Link>
+              </>
+            )}
+
             {user?.role === "admin" && (
               <div style={{ position: "relative" }}>
                 <button
