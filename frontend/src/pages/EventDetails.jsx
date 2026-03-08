@@ -13,6 +13,7 @@ export default function EventDetails() {
   const [loading, setLoading] = useState(true);
 
   const [selectedDate, setSelectedDate] = useState("");
+  const [customDate, setCustomDate] = useState("");
   const [attendees, setAttendees] = useState(1);
   const [foodPackage, setFoodPackage] = useState("standard");
   const [photographySelected, setPhotographySelected] = useState(false);
@@ -28,7 +29,8 @@ export default function EventDetails() {
         const res = await api.get(`/events/${id}`);
         if (!ignore) {
           setEvent(res.data);
-          setSelectedDate("");
+          setSelectedDate(res.data.availableDates?.[0] || "");
+          setCustomDate("");
           setAttendees(res.data.minAttendees || 1);
         }
       } catch {
@@ -49,21 +51,30 @@ export default function EventDetails() {
     };
   }, [id]);
 
+  const finalDate = selectedDate === "custom" ? customDate : selectedDate;
+
+  const foodPrices = useMemo(() => {
+    return {
+      standard: event?.foodPricing?.standard > 0 ? event.foodPricing.standard : 10,
+      premium: event?.foodPricing?.premium > 0 ? event.foodPricing.premium : 15,
+      vip: event?.foodPricing?.vip > 0 ? event.foodPricing.vip : 20
+    };
+  }, [event]);
+
   const foodPrice = useMemo(() => {
-    if (!event) return 0;
-    return event.foodPricing?.[foodPackage] || 0;
-  }, [event, foodPackage]);
+    return foodPrices[foodPackage] || 0;
+  }, [foodPrices, foodPackage]);
 
   const photographyPrice = useMemo(() => {
-    if (!event) return 0;
-    return photographySelected && event.photographyService?.available
-      ? event.photographyService.price
-      : 0;
+    const fallbackPhotoPrice =
+      event?.photographyService?.price > 0 ? event.photographyService.price : 25;
+
+    return photographySelected ? fallbackPhotoPrice : 0;
   }, [event, photographySelected]);
 
   const total = useMemo(() => {
     if (!event) return 0;
-    return event.venuePrice + foodPrice * attendees + photographyPrice;
+    return Number(event.venuePrice || 0) + foodPrice * attendees + photographyPrice;
   }, [event, attendees, foodPrice, photographyPrice]);
 
   function increaseAttendees() {
@@ -77,7 +88,7 @@ export default function EventDetails() {
   }
 
   async function bookNow() {
-    if (!selectedDate) {
+    if (!finalDate) {
       setToast({ type: "error", message: "Please select a date" });
       return;
     }
@@ -93,7 +104,7 @@ export default function EventDetails() {
     try {
       await api.post("/bookings", {
         eventId: id,
-        selectedDate,
+        selectedDate: finalDate,
         attendees: Number(attendees),
         foodPackage,
         photographySelected
@@ -177,16 +188,39 @@ export default function EventDetails() {
 
               <div style={{ marginTop: 12 }}>
                 <label>Date</label>
-                <input
-                  className="input"
-                  type="date"
+                <select
+                  className="select"
                   value={selectedDate}
                   onChange={(e) => setSelectedDate(e.target.value)}
-                  min={new Date().toISOString().split("T")[0]}
-                />
-                <div className="muted" style={{ marginTop: 8, fontSize: 13 }}>
-                  Choose any date that suits you.
-                </div>
+                  style={{ color: "#fff", backgroundColor: "#2a3146" }}
+                >
+                  {event.availableDates?.map((d) => (
+                    <option
+                      key={d}
+                      value={d}
+                      style={{ color: "#111", backgroundColor: "#fff" }}
+                    >
+                      {d}
+                    </option>
+                  ))}
+                  <option
+                    value="custom"
+                    style={{ color: "#111", backgroundColor: "#fff" }}
+                  >
+                    Choose my own date
+                  </option>
+                </select>
+
+                {selectedDate === "custom" && (
+                  <input
+                    className="input"
+                    type="date"
+                    style={{ marginTop: 12 }}
+                    value={customDate}
+                    onChange={(e) => setCustomDate(e.target.value)}
+                    min={new Date().toISOString().split("T")[0]}
+                  />
+                )}
               </div>
 
               <div style={{ marginTop: 14 }}>
@@ -215,10 +249,26 @@ export default function EventDetails() {
                   className="select"
                   value={foodPackage}
                   onChange={(e) => setFoodPackage(e.target.value)}
+                  style={{ color: "#fff", backgroundColor: "#2a3146" }}
                 >
-                  <option value="standard">Standard (${event.foodPricing.standard}/person)</option>
-                  <option value="premium">Premium (${event.foodPricing.premium}/person)</option>
-                  <option value="vip">VIP (${event.foodPricing.vip}/person)</option>
+                  <option
+                    value="standard"
+                    style={{ color: "#111", backgroundColor: "#fff" }}
+                  >
+                    Standard (${foodPrices.standard}/person)
+                  </option>
+                  <option
+                    value="premium"
+                    style={{ color: "#111", backgroundColor: "#fff" }}
+                  >
+                    Premium (${foodPrices.premium}/person)
+                  </option>
+                  <option
+                    value="vip"
+                    style={{ color: "#111", backgroundColor: "#fff" }}
+                  >
+                    VIP (${foodPrices.vip}/person)
+                  </option>
                 </select>
               </div>
 
@@ -228,14 +278,8 @@ export default function EventDetails() {
                     type="checkbox"
                     checked={photographySelected}
                     onChange={(e) => setPhotographySelected(e.target.checked)}
-                    disabled={!event.photographyService?.available}
                   />
-                  <span>
-                    Add photography
-                    {event.photographyService?.available
-                      ? ` ($${event.photographyService.price})`
-                      : " (Not available)"}
-                  </span>
+                  <span> Add photography (${event?.photographyService?.price > 0 ? event.photographyService.price : 25})</span>
                 </label>
               </div>
 
@@ -252,7 +296,7 @@ export default function EventDetails() {
 
               <div className="summaryRow" style={{ marginTop: 14 }}>
                 <span>Selected date</span>
-                <strong>{selectedDate || "Not selected"}</strong>
+                <strong>{finalDate || "Not selected"}</strong>
               </div>
 
               <div className="summaryRow">
