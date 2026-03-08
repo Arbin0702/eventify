@@ -7,7 +7,7 @@ export default function EventDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const backend = process.env.REACT_APP_API_URL || "http://localhost:4000";
+  const backend = "https://eventify-vrrg.onrender.com";
 
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -28,7 +28,7 @@ export default function EventDetails() {
         const res = await api.get(`/events/${id}`);
         if (!ignore) {
           setEvent(res.data);
-          setSelectedDate(res.data.availableDates?.[0] || "");
+          setSelectedDate("");
           setAttendees(res.data.minAttendees || 1);
         }
       } catch {
@@ -177,17 +177,16 @@ export default function EventDetails() {
 
               <div style={{ marginTop: 12 }}>
                 <label>Date</label>
-                <select
-                  className="select"
+                <input
+                  className="input"
+                  type="date"
                   value={selectedDate}
                   onChange={(e) => setSelectedDate(e.target.value)}
-                >
-                  {event.availableDates.map((d) => (
-                    <option key={d} value={d}>
-                      {d}
-                    </option>
-                  ))}
-                </select>
+                  min={new Date().toISOString().split("T")[0]}
+                />
+                <div className="muted" style={{ marginTop: 8, fontSize: 13 }}>
+                  Choose any date that suits you.
+                </div>
               </div>
 
               <div style={{ marginTop: 14 }}>
