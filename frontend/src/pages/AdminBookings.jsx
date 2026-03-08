@@ -128,10 +128,18 @@ export default function AdminBookings() {
                   className="select"
                   value={b.status}
                   onChange={(e) => setLocalStatus(b._id, e.target.value)}
-                  style={{ maxWidth: 220 }}
+                  style={{
+                    maxWidth: 220,
+                    color: "#fff",
+                    backgroundColor: "#2a3146"
+                  }}
                 >
                   {STATUS_OPTIONS.map((status) => (
-                    <option key={status} value={status}>
+                    <option
+                      key={status}
+                      value={status}
+                      style={{ color: "#111", backgroundColor: "#fff" }}
+                    >
                       {status}
                     </option>
                   ))}
@@ -145,7 +153,11 @@ export default function AdminBookings() {
                   {savingId === b._id ? "Saving..." : "Save"}
                 </button>
 
-                <Link className="btn ghost" to={`/bookings/${b._id}`} style={{ textDecoration: "none" }}>
+                <Link
+                  className="btn ghost"
+                  to={`/bookings/${b._id}`}
+                  style={{ textDecoration: "none" }}
+                >
                   Receipt
                 </Link>
               </div>
