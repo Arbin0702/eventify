@@ -159,27 +159,10 @@ export default function Events() {
 
                 <p style={{ marginTop: 12 }}>{event.description}</p>
 
-                <div className="row" style={{ marginTop: 12 }}>
-                  <span className="badge">
-                    🚗 {event.parkingAvailable ? "Parking Available" : "No Parking"}
-                  </span>
-
-                  <span className="badge">
-                    📸{" "}
-                    {event.photographyService?.available
-                      ? `Photo $${event.photographyService.price}`
-                      : "No Photo Service"}
-                  </span>
-                </div>
-
                 <div
                   className="row"
-                  style={{ marginTop: 14, justifyContent: "space-between" }}
+                  style={{ marginTop: 14, justifyContent: "flex-end" }}
                 >
-                  <span className="badge">
-                    Food from ${event.foodPricing?.standard || 0}/person
-                  </span>
-
                   <Link
                     className="btn primary"
                     to={`/events/${event._id}`}
