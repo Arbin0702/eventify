@@ -99,15 +99,17 @@ export default function Dashboard() {
 
             <div className="muted" style={{ marginTop: 12, fontSize: 14, lineHeight: 1.7 }}>
               {b.status === "pending" && "Your booking is waiting for admin review."}
-              {b.status === "approved" && "Your booking has been approved."}
-              {b.status === "completed" && "This booking has been completed successfully."}
+              {b.status === "approved" && "Your booking has been approved. A confirmation email has been sent and your receipt is now available."}
+              {b.status === "completed" && "This booking has been completed successfully. Your receipt remains available below."}
               {b.status === "cancelled" && "This booking has been cancelled."}
             </div>
 
             <div className="row" style={{ marginTop: 16 }}>
-              <Link className="btn ghost" to={`/bookings/${b._id}`} style={{ textDecoration: "none" }}>
-                View Receipt
-              </Link>
+              {(b.status === "approved" || b.status === "completed") && (
+                <Link className="btn ghost" to={`/bookings/${b._id}`} style={{ textDecoration: "none" }}>
+                  View Receipt
+                </Link>
+              )}
 
               <button
                 className="btn"

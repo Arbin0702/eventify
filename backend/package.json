@@ -2,13 +2,13 @@
   "name": "backend",
   "version": "1.0.0",
   "main": "src/server.js",
-"scripts": {
-  "dev": "nodemon src/server.js",
-  "start": "node src/server.js",
-  "seed": "node scripts/seed.js",
-  "test": "jest --runInBand"
-},
-"dependencies": {
+  "scripts": {
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js",
+    "seed": "node scripts/seed.js",
+    "test": "jest --runInBand"
+  },
+  "dependencies": {
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
@@ -18,7 +18,8 @@
     "joi": "^17.13.3",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.6.1",
-    "multer": "^2.1.1"
+    "multer": "^2.1.1",
+    "nodemailer": "^8.0.1"
   },
   "devDependencies": {
     "jest": "^29.7.0",
