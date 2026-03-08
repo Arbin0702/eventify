@@ -42,24 +42,24 @@ export default function EditEvent() {
       setLoading(true);
       try {
         const res = await api.get(`/events/${id}`);
-        const e = res.data;
+        const item = res.data;
 
-        setTitle(e.title || "");
-        setLocation(e.location || "");
-        setDescription(e.description || "");
-        setCurrentImageUrl(e.imageUrl || "");
-        setAvailableDates(e.availableDates?.length ? e.availableDates : [""]);
-        setMinAttendees(e.minAttendees || 1);
-        setMaxAttendees(e.maxAttendees || 100);
-        setVenuePrice(e.venuePrice || 0);
+        setTitle(item.title || "");
+        setLocation(item.location || "");
+        setDescription(item.description || "");
+        setCurrentImageUrl(item.imageUrl || "");
+        setAvailableDates(item.availableDates?.length ? item.availableDates : [""]);
+        setMinAttendees(item.minAttendees || 1);
+        setMaxAttendees(item.maxAttendees || 100);
+        setVenuePrice(item.venuePrice || 0);
 
-        setFoodStandard(e.foodPricing?.standard || 0);
-        setFoodPremium(e.foodPricing?.premium || 0);
-        setFoodVip(e.foodPricing?.vip || 0);
+        setFoodStandard(item.foodPricing?.standard || 0);
+        setFoodPremium(item.foodPricing?.premium || 0);
+        setFoodVip(item.foodPricing?.vip || 0);
 
-        setParkingAvailable(Boolean(e.parkingAvailable));
-        setPhotoAvailable(Boolean(e.photographyService?.available));
-        setPhotoPrice(e.photographyService?.price || 0);
+        setParkingAvailable(Boolean(item.parkingAvailable));
+        setPhotoAvailable(Boolean(item.photographyService?.available));
+        setPhotoPrice(item.photographyService?.price || 0);
       } catch {
         setToast({ type: "error", message: "❌ Failed to load event" });
       } finally {
@@ -71,24 +71,24 @@ export default function EditEvent() {
   }, [id]);
 
   function validate() {
-    const e = {};
-    if (!title.trim()) e.title = "Title is required";
-    if (!location.trim()) e.location = "Location is required";
-    if (!description.trim()) e.description = "Description is required";
+    const errors = {};
+    if (!title.trim()) errors.title = "Title is required";
+    if (!location.trim()) errors.location = "Location is required";
+    if (!description.trim()) errors.description = "Description is required";
     if (!keepExistingImage && !newImage) {
-      e.image = "Choose a new image or keep the current one";
+      errors.image = "Choose a new image or keep the current one";
     }
 
     const cleanedDates = availableDates.map((d) => d.trim()).filter(Boolean);
-    if (cleanedDates.length === 0) e.availableDates = "At least one date is required";
+    if (cleanedDates.length === 0) errors.availableDates = "At least one date is required";
 
-    if (Number(minAttendees) < 1) e.minAttendees = "Minimum attendees must be at least 1";
+    if (Number(minAttendees) < 1) errors.minAttendees = "Minimum attendees must be at least 1";
     if (Number(maxAttendees) < Number(minAttendees)) {
-      e.maxAttendees = "Max attendees must be greater than or equal to min attendees";
+      errors.maxAttendees = "Max attendees must be greater than or equal to min attendees";
     }
 
-    setFieldErrors(e);
-    return Object.keys(e).length === 0;
+    setFieldErrors(errors);
+    return Object.keys(errors).length === 0;
   }
 
   async function save() {
@@ -124,10 +124,10 @@ export default function EditEvent() {
 
       setToast({ type: "success", message: "✅ Event updated" });
       setTimeout(() => navigate(`/events/${id}`), 700);
-    } catch (e) {
+    } catch (err) {
       setToast({
         type: "error",
-        message: e?.response?.data?.message || "❌ Failed to update event"
+        message: err?.response?.data?.message || "❌ Failed to update event"
       });
     } finally {
       setSaving(false);
@@ -142,12 +142,11 @@ export default function EditEvent() {
     );
   }
 
-  const previewSrc =
-    currentImageUrl
-      ? currentImageUrl.startsWith("http")
-        ? currentImageUrl
-        : `${backend}${currentImageUrl}`
-      : "";
+  const previewSrc = currentImageUrl
+    ? currentImageUrl.startsWith("http")
+      ? currentImageUrl
+      : `${backend}${currentImageUrl}`
+    : "";
 
   return (
     <div className="container" style={{ paddingTop: 18 }}>
@@ -174,8 +173,196 @@ export default function EditEvent() {
         </div>
       </section>
 
-      {/* The rest of your form remains unchanged */}
-      {/* ... (all your form fields stay the same) */}
+      <div className="grid2" style={{ marginTop: 18 }}>
+        <div className="friendlyCard">
+          <h3>Basic details</h3>
+
+          <div style={{ marginTop: 12 }}>
+            <input
+              className="input"
+              placeholder="Event title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+            />
+            <FieldError message={fieldErrors.title} />
+          </div>
+
+          <div style={{ marginTop: 12 }}>
+            <input
+              className="input"
+              placeholder="Location"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+            />
+            <FieldError message={fieldErrors.location} />
+          </div>
+
+          {previewSrc && (
+            <div style={{ marginTop: 12 }}>
+              <img
+                src={previewSrc}
+                alt="Current event"
+                style={{ width: "100%", height: 220, objectFit: "cover", borderRadius: 16 }}
+                onError={(e) => {
+                  e.currentTarget.onerror = null;
+                  e.currentTarget.src =
+                    "https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1400&q=80";
+                }}
+              />
+            </div>
+          )}
+
+          <div style={{ marginTop: 12 }}>
+            <label className="row" style={{ cursor: "pointer" }}>
+              <input
+                type="checkbox"
+                checked={keepExistingImage}
+                onChange={(e) => setKeepExistingImage(e.target.checked)}
+              />
+              <span>Keep current image</span>
+            </label>
+          </div>
+
+          <div style={{ marginTop: 12 }}>
+            <input
+              className="input"
+              type="file"
+              accept="image/png,image/jpeg,image/webp"
+              onChange={(e) => setNewImage(e.target.files?.[0] || null)}
+            />
+            <FieldError message={fieldErrors.image} />
+          </div>
+
+          <div style={{ marginTop: 12 }}>
+            <textarea
+              className="textarea"
+              style={{ minHeight: 140 }}
+              placeholder="Description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+            />
+            <FieldError message={fieldErrors.description} />
+          </div>
+
+          <div style={{ marginTop: 12 }}>
+            <label style={{ display: "block", marginBottom: 8 }}>Available dates</label>
+            <DateListEditor
+              dates={availableDates}
+              setDates={setAvailableDates}
+              error={fieldErrors.availableDates}
+            />
+          </div>
+        </div>
+
+        <div className="friendlyCard">
+          <h3>Capacity & venue</h3>
+
+          <div style={{ marginTop: 12 }}>
+            <label>Minimum attendees</label>
+            <input
+              className="input"
+              type="number"
+              value={minAttendees}
+              onChange={(e) => setMinAttendees(e.target.value)}
+            />
+            <FieldError message={fieldErrors.minAttendees} />
+          </div>
+
+          <div style={{ marginTop: 12 }}>
+            <label>Maximum attendees</label>
+            <input
+              className="input"
+              type="number"
+              value={maxAttendees}
+              onChange={(e) => setMaxAttendees(e.target.value)}
+            />
+            <FieldError message={fieldErrors.maxAttendees} />
+          </div>
+
+          <div style={{ marginTop: 12 }}>
+            <label>Venue price</label>
+            <input
+              className="input"
+              type="number"
+              value={venuePrice}
+              onChange={(e) => setVenuePrice(e.target.value)}
+            />
+          </div>
+
+          <div style={{ marginTop: 12 }}>
+            <label className="row" style={{ cursor: "pointer" }}>
+              <input
+                type="checkbox"
+                checked={parkingAvailable}
+                onChange={(e) => setParkingAvailable(e.target.checked)}
+              />
+              <span>Parking available</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid2" style={{ marginTop: 18 }}>
+        <div className="friendlyCard">
+          <h3>Food pricing (per person)</h3>
+
+          <div style={{ marginTop: 12 }}>
+            <label>Standard</label>
+            <input
+              className="input"
+              type="number"
+              value={foodStandard}
+              onChange={(e) => setFoodStandard(e.target.value)}
+            />
+          </div>
+
+          <div style={{ marginTop: 12 }}>
+            <label>Premium</label>
+            <input
+              className="input"
+              type="number"
+              value={foodPremium}
+              onChange={(e) => setFoodPremium(e.target.value)}
+            />
+          </div>
+
+          <div style={{ marginTop: 12 }}>
+            <label>VIP</label>
+            <input
+              className="input"
+              type="number"
+              value={foodVip}
+              onChange={(e) => setFoodVip(e.target.value)}
+            />
+          </div>
+        </div>
+
+        <div className="friendlyCard">
+          <h3>Photography service</h3>
+
+          <div style={{ marginTop: 12 }}>
+            <label className="row" style={{ cursor: "pointer" }}>
+              <input
+                type="checkbox"
+                checked={photoAvailable}
+                onChange={(e) => setPhotoAvailable(e.target.checked)}
+              />
+              <span>Photography available</span>
+            </label>
+          </div>
+
+          <div style={{ marginTop: 12 }}>
+            <label>Photography price</label>
+            <input
+              className="input"
+              type="number"
+              value={photoPrice}
+              onChange={(e) => setPhotoPrice(e.target.value)}
+              disabled={!photoAvailable}
+            />
+          </div>
+        </div>
+      </div>
 
       <div style={{ marginTop: 18 }}>
         <button className="btn primary" onClick={save} disabled={saving}>
