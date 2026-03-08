@@ -70,15 +70,33 @@ async function sendApprovalEmail(booking) {
 exports.createBooking = async (req, res, next) => {
   try {
     const { error, value } = createBookingSchema.validate(req.body);
-    if (error) return res.status(400).json({ message: error.details[0].message });
+    if (error) {
+      return res.status(400).json({ message: error.details[0].message });
+    }
 
     const { eventId, selectedDate, attendees, foodPackage, photographySelected } = value;
 
     const event = await Event.findById(eventId);
-    if (!event) return res.status(404).json({ message: "Event not found" });
+    if (!event) {
+      return res.status(404).json({ message: "Event not found" });
+    }
 
-    if (!event.availableDates.includes(selectedDate)) {
-      return res.status(400).json({ message: "Selected date is not available" });
+    if (!selectedDate) {
+      return res.status(400).json({ message: "Selected date is required" });
+    }
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const pickedDate = new Date(selectedDate);
+    pickedDate.setHours(0, 0, 0, 0);
+
+    if (Number.isNaN(pickedDate.getTime())) {
+      return res.status(400).json({ message: "Invalid selected date" });
+    }
+
+    if (pickedDate < today) {
+      return res.status(400).json({ message: "Selected date cannot be in the past" });
     }
 
     if (attendees < event.minAttendees || attendees > event.maxAttendees) {
@@ -93,7 +111,10 @@ exports.createBooking = async (req, res, next) => {
         ? event.photographyService.price
         : 0;
 
-    const totalPrice = event.venuePrice + foodPricePerPerson * attendees + photographyPrice;
+    const totalPrice =
+      Number(event.venuePrice || 0) +
+      Number(foodPricePerPerson || 0) * Number(attendees || 0) +
+      Number(photographyPrice || 0);
 
     const booking = await Booking.create({
       userId: req.user.id,
@@ -130,7 +151,9 @@ exports.getBookingById = async (req, res, next) => {
       .populate("eventId")
       .populate("userId", "name email role");
 
-    if (!booking) return res.status(404).json({ message: "Booking not found" });
+    if (!booking) {
+      return res.status(404).json({ message: "Booking not found" });
+    }
 
     const isOwner = booking.userId?._id?.toString() === req.user.id;
     const isAdmin = req.user.role === "admin";
@@ -168,7 +191,9 @@ exports.updateBookingStatus = async (req, res, next) => {
     }
 
     const booking = await Booking.findById(req.params.id);
-    if (!booking) return res.status(404).json({ message: "Booking not found" });
+    if (!booking) {
+      return res.status(404).json({ message: "Booking not found" });
+    }
 
     const previousStatus = booking.status;
     booking.status = status;
@@ -196,8 +221,14 @@ exports.cancelBooking = async (req, res, next) => {
   try {
     const bookingId = req.params.id;
 
-    const booking = await Booking.findOne({ _id: bookingId, userId: req.user.id });
-    if (!booking) return res.status(404).json({ message: "Booking not found" });
+    const booking = await Booking.findOne({
+      _id: bookingId,
+      userId: req.user.id
+    });
+
+    if (!booking) {
+      return res.status(404).json({ message: "Booking not found" });
+    }
 
     if (booking.status === "completed") {
       return res.status(400).json({ message: "Completed booking cannot be cancelled" });
