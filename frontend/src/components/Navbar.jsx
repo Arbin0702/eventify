@@ -79,10 +79,8 @@ export default function Navbar() {
 
             {user?.role === "admin" && (
               <>
-                <Link className="link" to="/create-event" onClick={closeAll}>
-                  Create Event
-                </Link>
 
+              
                 <Link className="link" to="/admin/inbox" onClick={closeAll}>
                   Inbox
                 </Link>
