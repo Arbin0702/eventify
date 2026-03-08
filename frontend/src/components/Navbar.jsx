@@ -5,6 +5,7 @@ import ThemeToggle from "./ThemeToggle";
 export default function Navbar() {
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [adminOpen, setAdminOpen] = useState(false);
   const navRef = useRef(null);
 
   const token = localStorage.getItem("token");
@@ -15,22 +16,26 @@ export default function Navbar() {
     localStorage.removeItem("user");
     navigate("/login");
     setMobileOpen(false);
+    setAdminOpen(false);
   }
 
   function closeAll() {
     setMobileOpen(false);
+    setAdminOpen(false);
   }
 
   useEffect(() => {
     function handleClickOutside(e) {
       if (navRef.current && !navRef.current.contains(e.target)) {
         setMobileOpen(false);
+        setAdminOpen(false);
       }
     }
 
     function handleEsc(e) {
       if (e.key === "Escape") {
         setMobileOpen(false);
+        setAdminOpen(false);
       }
     }
 
@@ -78,21 +83,44 @@ export default function Navbar() {
             </Link>
 
             {user?.role === "admin" && (
-              <>
+              <div style={{ position: "relative" }}>
+                <button
+                  className="btn ghost"
+                  type="button"
+                  onClick={() => setAdminOpen((v) => !v)}
+                  style={{ marginLeft: 8 }}
+                >
+                  Admin ▾
+                </button>
 
-              
-                <Link className="link" to="/admin/inbox" onClick={closeAll}>
-                  Inbox
-                </Link>
-
-                <Link className="link" to="/admin/portfolio" onClick={closeAll}>
-                  Portfolio
-                </Link>
-
-                <Link className="link" to="/admin/bookings" onClick={closeAll}>
-                  Bookings
-                </Link>
-              </>
+                {adminOpen && (
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: "110%",
+                      right: 0,
+                      minWidth: 180,
+                      background: "#1e2235",
+                      border: "1px solid rgba(255,255,255,0.08)",
+                      borderRadius: 14,
+                      padding: 10,
+                      display: "grid",
+                      gap: 8,
+                      zIndex: 50
+                    }}
+                  >
+                    <Link className="link" to="/admin/inbox" onClick={closeAll}>
+                      Inbox
+                    </Link>
+                    <Link className="link" to="/admin/portfolio" onClick={closeAll}>
+                      Portfolio
+                    </Link>
+                    <Link className="link" to="/admin/bookings" onClick={closeAll}>
+                      Bookings
+                    </Link>
+                  </div>
+                )}
+              </div>
             )}
           </div>
 
