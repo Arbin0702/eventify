@@ -76,6 +76,26 @@ export default function Navbar() {
             <Link className="link" to="/contact" onClick={closeAll}>
               Contact
             </Link>
+
+            {user?.role === "admin" && (
+              <>
+                <Link className="link" to="/create-event" onClick={closeAll}>
+                  Create Event
+                </Link>
+
+                <Link className="link" to="/admin/inbox" onClick={closeAll}>
+                  Inbox
+                </Link>
+
+                <Link className="link" to="/admin/portfolio" onClick={closeAll}>
+                  Portfolio
+                </Link>
+
+                <Link className="link" to="/admin/bookings" onClick={closeAll}>
+                  Bookings
+                </Link>
+              </>
+            )}
           </div>
 
           <div className="megaNavRight desktopOnlyNavActions">
@@ -97,6 +117,16 @@ export default function Navbar() {
                   <span className="muted" style={{ marginRight: 12 }}>
                     Hi, {user.name}
                   </span>
+                )}
+
+                {user?.role === "admin" && (
+                  <Link
+                    className="btn primary"
+                    to="/create-event"
+                    style={{ textDecoration: "none", marginRight: 12 }}
+                  >
+                    Create Event
+                  </Link>
                 )}
 
                 <button className="btn ghost" onClick={logout}>
