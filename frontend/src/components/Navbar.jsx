@@ -4,7 +4,6 @@ import ThemeToggle from "./ThemeToggle";
 
 export default function Navbar() {
   const navigate = useNavigate();
-  const [openMenu, setOpenMenu] = useState("");
   const [mobileOpen, setMobileOpen] = useState(false);
   const navRef = useRef(null);
 
@@ -16,28 +15,21 @@ export default function Navbar() {
     localStorage.removeItem("user");
     navigate("/login");
     setMobileOpen(false);
-    setOpenMenu("");
-  }
-
-  function toggle(menu) {
-    setOpenMenu((prev) => (prev === menu ? "" : menu));
   }
 
   function closeAll() {
-    setOpenMenu("");
     setMobileOpen(false);
   }
 
   useEffect(() => {
     function handleClickOutside(e) {
       if (navRef.current && !navRef.current.contains(e.target)) {
-        setOpenMenu("");
+        setMobileOpen(false);
       }
     }
 
     function handleEsc(e) {
       if (e.key === "Escape") {
-        setOpenMenu("");
         setMobileOpen(false);
       }
     }
@@ -55,7 +47,6 @@ export default function Navbar() {
     <div className="navbar" ref={navRef}>
       <div className="container">
         <div className="megaNavRow">
-
           <Link className="brand" to="/" onClick={closeAll}>
             Eventify
           </Link>
@@ -64,6 +55,7 @@ export default function Navbar() {
             className="mobileMenuBtn"
             type="button"
             onClick={() => setMobileOpen((v) => !v)}
+            aria-label="Toggle navigation menu"
           >
             {mobileOpen ? "✕" : "☰"}
           </button>
@@ -86,9 +78,7 @@ export default function Navbar() {
             </Link>
           </div>
 
-          {/* RIGHT SIDE */}
           <div className="megaNavRight desktopOnlyNavActions">
-
             <ThemeToggle />
 
             {!token ? (
@@ -115,7 +105,6 @@ export default function Navbar() {
               </>
             )}
           </div>
-
         </div>
       </div>
     </div>
